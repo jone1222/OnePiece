@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <script src ="webgl-utils.js"></script>
+        <script src ="webgl-debug.js"></script>
+        <script src ="cuon-utils.js"></script>
+        <script src ="cuon-matrix.js"></script>
+        <script src ="Cake.js"></script>
+        <style>
+            canvas{
+                position : absolute;
+                left: 0%;
+                top : 0%;
+                width : 40%;
+                height : 40%;
+            }
+            #Status{
+                position : absolute;
+                left : 50%;
+                top : 20%;
+            }
+            ul{
+                float : left;
+            }
+        </style>
+        <title>TODO supply a title</title>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    </head>
+    <body>
+        <canvas id="gpudraw" onload="DrawStatus()"></canvas>
+        <div id = "Status">
+            <table>
+                <tr>
+                    <td>
+                        대상 레이어
+                    </td>
+                    <td>
+                        <select id="editLayer" onchange="editLayer(this)" disabled="disabled">
+                            <option value="-1">Default</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="checkbox" id="isEdit" onchange="changeMode(this)">편집모드
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        레이어 형태
+                    </td>
+                    <td>
+                        <select id="selectType" onchange="UpdateType(this)">
+                            <option value="-1">Default</option>
+                            <option value="type1">Type 1</option>
+                            <option value="type2">Type 2</option>
+                            <option value="type3">Type 3</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        레이어 색상
+                    </td>
+                    <td>
+                        <select id="selectColor" onchange="UpdateColor(this)">
+                            <option value="-1">Default</option>
+                            <option value="red">red</option>
+                            <option value="pink">pink</option>
+                            <option value="orange">orange</option>
+                        </select>
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <button id="return" value="return" onclick="popStatus()">return</button>
+                    </td>
+                    <td>
+                        <button id="apply" value="apply" onclick="UpdateStatus()" disabled="disabled">apply</button>
+                    </td>
+                    <td>
+                        <button id="addLayer" value="apply" onclick="AddLayer()">Add Layer</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </body>
+</html>
