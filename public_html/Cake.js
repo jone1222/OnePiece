@@ -70,7 +70,10 @@ var theta =0.0;
 
 var Status = function(){
     this.cakeLayers = [];
+    this.colorChoose = -1;
+    this.typeChoose = -1;
 };
+
 Status.prototype.copyStatus = function(target){
     this.cakeLayers.length = 0;
 
@@ -92,6 +95,8 @@ Status.prototype.copyStatus = function(target){
         }
         this.cakeLayers.push(tempCake);
     }
+    this.colorChoose = target.colorChoose;
+    this.typeChoose = target.typeChoose;
 };
 
 var befStatus = new Status();
@@ -136,10 +141,8 @@ var UpdateType = function(type){
     }
 };
 
-var colorChoose;
-
 var UpdateColor = function(color){
-    colorChoose = color.value;
+    curStatus.colorChoose = color.value;
     switch(color.value){
         case -1 : Cakecolor = [1.0,1.0,1.0,1.0]; break;
         case "red" : Cakecolor = [1.0, 0.0, 0.0, 1.0]; break;
@@ -171,7 +174,7 @@ var UpdateStatus = function(){
         alert("Appropriate Layer has to be chosen!!");
     }
     else{
-        curStatus.cakeLayers[select.value].color = newColor.value;
+        curStatus.cakeLayers[select.value].color = status.colorChoose;
         curStatus.cakeLayers[select.value].type = newType.value;
 
 
@@ -187,9 +190,9 @@ var UpdateStatus = function(){
             curStatus.cakeLayers[select.value].vertice[ i * 7 + 5 ] = Cakecolor[2];
             curStatus.cakeLayers[select.value].vertice[ i * 7 + 6 ] = Cakecolor[3];
         }
-        newColor.value = -1;
-        newType.value = -1;
-        select.value = -1;
+        //newColor.value = -1;
+        //newType.value = -1;
+        //select.value = -1;
         //DrawStatus();
     }
 };
@@ -302,7 +305,7 @@ function AddLayer(){
     //var newColor = document.getElementById('selectColor');
     var newType = document.getElementById('selectType');
 
-    var newLayer = new CakeLayer(newType.value, colorChoose);
+    var newLayer = new CakeLayer(newType.value, curStatus.colorChoose);
 
     newLayer.changeColor(newLayer.color, newLayer.vertice);
 
@@ -311,7 +314,7 @@ function AddLayer(){
     var select = document.getElementById('editLayer');
     var option = document.createElement('input');
     option.type = "image";
-    option.setAttribute("style", "background-color: " + colorChoose + ";");
+    option.setAttribute("style", "background-color: " + curStatus.colorChoose + ";");
     //style=" background-color: red;"
     option.id = curStatus.cakeLayers.length-1;
     option.value = curStatus.cakeLayers.length;
@@ -350,7 +353,7 @@ var editLayer = function(obj){
 var changeMode = function(obj){
     curStatus = historyStatus[historyStatus.length - 1];
 
-    colorChoose = -1;
+    status.colorChoose = -1;
     //var checkbox = document.getElementById('isEdit');
     //var select = document.getElementById('editLayer');
     var addButton = document.getElementById('all');
