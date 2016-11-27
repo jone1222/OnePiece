@@ -2,7 +2,7 @@
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
-*/
+ */
 var VSHADER_SOURCE =                            //  Vertex Shader
     'attribute vec4 a_Position; \n' +
     'attribute vec4 a_Color; \n' +
@@ -104,6 +104,7 @@ var CakeLayer = function(type, color){
     this.vertice = vertices.slice(0);
     this.color = color; //default value when color has not been set
 };
+
 CakeLayer.prototype.changeColor = function(targetColor, targetVertice){
     switch(targetColor){
         case -1 : Cakecolor = [1.0,1.0,1.0,1.0]; break;
@@ -118,12 +119,14 @@ CakeLayer.prototype.changeColor = function(targetColor, targetVertice){
         targetVertice[ i * 7 + 6 ] = Cakecolor[3];
     }
 };
+
 CakeLayer.prototype.changeType = function(layerType, receivedType){
     layerType = receivedType;
 };
 
 var Caketype = -1;
 var Cakecolor = [1.0, 1.0, 1.0, 1.0];
+
 var UpdateType = function(type){
     switch(type.value){
         case -1 : Caketype = -1; break;
@@ -132,7 +135,11 @@ var UpdateType = function(type){
         case "type3" : Caketype = 3; break;
     }
 };
+
+var colorChoose;
+
 var UpdateColor = function(color){
+    colorChoose = color.value;
     switch(color.value){
         case -1 : Cakecolor = [1.0,1.0,1.0,1.0]; break;
         case "red" : Cakecolor = [1.0, 0.0, 0.0, 1.0]; break;
@@ -243,7 +250,7 @@ var DrawStatus = function(){
     };
 
     repeat();
-    
+
 };
 var update_count = 0;
 
@@ -252,35 +259,36 @@ var update = function(){
 };
 
 function rotatedraw(gl, bufferID, elementID){
-        gl.bindBuffer(gl.ARRAY_BUFFER, bufferID);
-        var posLoc = gl.getAttribLocation(gl.program,'a_Position');
-        gl.vertexAttribPointer(posLoc,3,gl.FLOAT,false,4*7,0);  //  x,y,z,r,g,b,a
-        gl.enableVertexAttribArray(posLoc);
+    gl.bindBuffer(gl.ARRAY_BUFFER, bufferID);
+    var posLoc = gl.getAttribLocation(gl.program,'a_Position');
+    gl.vertexAttribPointer(posLoc,3,gl.FLOAT,false,4*7,0);  //  x,y,z,r,g,b,a
+    gl.enableVertexAttribArray(posLoc);
 
-        var colLoc = gl.getAttribLocation(gl.program,'a_Color');
-        gl.vertexAttribPointer(colLoc,4,gl.FLOAT,false,4*7,4*3);
-        gl.enableVertexAttribArray(colLoc);
+    var colLoc = gl.getAttribLocation(gl.program,'a_Color');
+    gl.vertexAttribPointer(colLoc,4,gl.FLOAT,false,4*7,4*3);
+    gl.enableVertexAttribArray(colLoc);
 
-        gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementID);
-        gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
+    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, elementID);
+    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, new Uint16Array(indices), gl.STATIC_DRAW);
 
-        var u_MoveLoc = gl.getUniformLocation(gl.program, 'u_Move');
+    var u_MoveLoc = gl.getUniformLocation(gl.program, 'u_Move');
 
-        var u_ThetaLoc = gl.getUniformLocation(gl.program, 'u_Theta');
+    var u_ThetaLoc = gl.getUniformLocation(gl.program, 'u_Theta');
 
-        gl.enable(gl.DEPTH_TEST);
+    gl.enable(gl.DEPTH_TEST);
 
-        gl.clearColor(1.0, 1.0, 1.0, 1.0);
-        gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.clearColor(1.0, 1.0, 1.0, 1.0);
+    gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
-        for(var i = 0; i < curStatus.cakeLayers.length; i++) {
-            gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(curStatus.cakeLayers[i].vertice), gl.STATIC_DRAW);
-            var uPosLoc = gl.getUniformLocation(gl.program, 'u_Pos');
-            gl.uniform3f(u_MoveLoc, 0.0, 0.0, 0.0);
-            gl.uniform1f(u_ThetaLoc, theta);
-            gl.uniform3f(uPosLoc, 0.0 , 0.5 * i , 0.0);
-            gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
-        }
+    for(var i = 0; i < curStatus.cakeLayers.length; i++) {
+
+        gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(curStatus.cakeLayers[i].vertice), gl.STATIC_DRAW);
+        var uPosLoc = gl.getUniformLocation(gl.program, 'u_Pos');
+        gl.uniform3f(u_MoveLoc, 0.0, 0.0, 0.0);
+        gl.uniform1f(u_ThetaLoc, theta);
+        gl.uniform3f(uPosLoc, 0.0 , 0.5 * i , 0.0);
+        gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
+    }
 }
 var Layercount = 1;
 function AddLayer(){
@@ -291,24 +299,30 @@ function AddLayer(){
     curStatus = historyStatus[historyStatus.length - 1];
 
     Layercount += 1;
-    var newColor = document.getElementById('selectColor');
+    //var newColor = document.getElementById('selectColor');
     var newType = document.getElementById('selectType');
 
-    var newLayer = new CakeLayer(newType.value, newColor.value);
+    var newLayer = new CakeLayer(newType.value, colorChoose);
 
     newLayer.changeColor(newLayer.color, newLayer.vertice);
 
     curStatus.cakeLayers.push(newLayer);
 
     var select = document.getElementById('editLayer');
-    var option = document.createElement("option");
-    option.value = curStatus.cakeLayers.length - 1;
-    option.text = "Layer" + (curStatus.cakeLayers.length);
-    select.add(option);
+    var option = document.createElement('input');
+    option.type = "image";
+    option.setAttribute("style", "background-color: " + colorChoose + ";");
+    //style=" background-color: red;"
+    option.id = curStatus.cakeLayers.length-1;
+    option.value = curStatus.cakeLayers.length;
+    option.setAttribute("class", "exampleImage") ;
+    //option.text = "Layer" + (curStatus.cakeLayers.length);
+    option.setAttribute("onclick", "editLayer(this)");
+    select.appendChild(option);
 
-    newColor.value = -1;
-    newType.value = -1;
-    
+    //newColor.value = -1;
+    //newType.value = -1;
+
     DrawStatus();
 }
 var isEdit = false;
@@ -336,39 +350,30 @@ var editLayer = function(obj){
 var changeMode = function(obj){
     curStatus = historyStatus[historyStatus.length - 1];
 
-    var checkbox = document.getElementById('isEdit');
-    var select = document.getElementById('editLayer');
-    var addButton = document.getElementById('addLayer');
-    var applyButton = document.getElementById('apply');
+    colorChoose = -1;
+    //var checkbox = document.getElementById('isEdit');
+    //var select = document.getElementById('editLayer');
+    var addButton = document.getElementById('all');
+    var applyButton = document.getElementById('each');
+    var editLayer =  document.getElementById('editLayer');
 
-
-    for(var i = select.options.length - 1; i >= 0; i--){
-        select.options[i] = null;
-    }
-    var Default = document.createElement('option');
-    Default.value = -1;
-    Default.text = "Default";
-    select.add(Default);
-
-    for(var i = 0; i < curStatus.cakeLayers.length; i++){
-        var option = document.createElement('option');
-
-        option.value = i;
-        option.text = "Layer" + (i + 1);
-        select.add(option);
-    }
-    select.value = -1;
-    if(obj.checked == true){
+    if(obj.id == "each"){
         isEdit = true;
-        select.removeAttribute('disabled');
-        addButton.disabled = 'disabled';
-        applyButton.removeAttribute('disabled');
+        editLayer.style.opacity = 1.0;
+        editLayer.style.pointerEvents = 'auto';
+        applyButton.disabled = 'disabled';
+        addButton.removeAttribute('disabled');
+        document.getElementById('addLayer').disabled = 'disabled';
+        document.getElementById('apply').removeAttribute('disabled');
     }
     else{
         isEdit = false;
-        select.disabled = 'disabled';
-        addButton.removeAttribute('disabled');
-        applyButton.disabled = 'disabled';
+        editLayer.style.pointerEvents = 'none';
+        editLayer.style.opacity = 0.5;
+        applyButton.removeAttribute('disabled');
+        addButton.disabled = 'disabled';
+        document.getElementById('apply').disabled = 'disabled';
+        document.getElementById('addLayer').removeAttribute('disabled');
     }
 };
 
@@ -379,30 +384,31 @@ function popStatus(){
     }
     historyStatus.pop();
     curStatus = historyStatus[historyStatus.length - 1];
-    if(isEdit == true){
-        var select = document.getElementById('editLayer');
-        var newColor = document.getElementById('selectColor');
-        var newType = document.getElementById('selectType');
+    //if(isEdit == true){
+    var select = document.getElementById('editLayer');
+    var newColor = document.getElementById('selectColor');
+    var newType = document.getElementById('selectType');
 
-        for(var i = select.options.length - 1; i >= 0; i--){
-            select.options[i] = null;
-        }
-        var Default = document.createElement('option');
-        Default.value = -1;
-        Default.text = "Default";
-        select.add(Default);
+    //for(var i = select.options.length - 1; i >= 0; i--){
+    //    select.options[i] = null;
+    //}
+    var Default = document.createElement('option');
+    Default.value = -1;
+    Default.text = "Default";
+    //select.add(Default);
 
-        for(var i = 0; i < curStatus.cakeLayers.length; i++){
-            var option = document.createElement('option');
+    //for(var i = 0; i < curStatus.cakeLayers.length; i++){
+    //var option = document.createElement('option');
 
-            option.value = i;
-            option.text = "Layer" + (i + 1);
-            select.add(option);
-        }
-        select.value = -1;
-        newColor.value = -1;
-        newType.value = -1;
+    //  option.value = i;
+    //  option.text = "Layer" + (i + 1);
+    var latest = document.getElementById(curStatus.cakeLayers.length);
+    select.removeChild(latest);
+    //}
+    select.value = -1;
+    //newColor.value = -1;
+    newType.value = -1;
 
-    }
+    //}
 }
 

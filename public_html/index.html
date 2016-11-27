@@ -5,88 +5,87 @@ To change this template file, choose Tools | Templates
 and open the template in the editor.
 -->
 <html>
-    <head>
-        <script src ="webgl-utils.js"></script>
-        <script src ="webgl-debug.js"></script>
-        <script src ="cuon-utils.js"></script>
-        <script src ="cuon-matrix.js"></script>
-        <script src ="Cake.js"></script>
-        <style>
-            canvas{
-                position : absolute;
-                left: 0%;
-                top : 0%;
-                width : 40%;
-                height : 40%;
-            }
-            #Status{
-                position : absolute;
-                left : 50%;
-                top : 20%;
-            }
-            ul{
-                float : left;
-            }
-        </style>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body>
+<head>
+    <title>TODO supply a title</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel ="stylesheet" type="text/css" href="layout.css">
+</head>
+<body>
+<div id="page-wrapper">
+    <h1>CAKE SIMULATOR</h1>
+    <div id="drawCake">
         <canvas id="gpudraw" onload="DrawStatus()"></canvas>
-        <div id = "Status">
-            <table>
-                <tr>
-                    <td>
-                        대상 레이어
-                    </td>
-                    <td>
-                        <select id="editLayer" onchange="editLayer(this)" disabled="disabled">
-                            <option value="-1">Default</option>
-                        </select>
-                    </td>
-                    <td>
-                        <input type="checkbox" id="isEdit" onchange="changeMode(this)">편집모드
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        레이어 형태
-                    </td>
-                    <td>
-                        <select id="selectType" onchange="UpdateType(this)">
-                            <option value="-1">Default</option>
-                            <option value="type1">Type 1</option>
-                            <option value="type2">Type 2</option>
-                            <option value="type3">Type 3</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        레이어 색상
-                    </td>
-                    <td>
-                        <select id="selectColor" onchange="UpdateColor(this)">
-                            <option value="-1">Default</option>
-                            <option value="red">red</option>
-                            <option value="pink">pink</option>
-                            <option value="orange">orange</option>
-                        </select>
-                    </td>
-                </tr>
-                <tr>
-                    <td>
-                        <button id="return" value="return" onclick="popStatus()">return</button>
-                    </td>
-                    <td>
-                        <button id="apply" value="apply" onclick="UpdateStatus()" disabled="disabled">apply</button>
-                    </td>
-                    <td>
-                        <button id="addLayer" value="apply" onclick="AddLayer()">Add Layer</button>
-                    </td>
-                </tr>
-            </table>
+    </div>
+    <div id="status">
+        <h2>STATUS</h2>
+        <div id="editLayer">
+            <!--<input type="image" style="background-color: pink;" value="0" class="exampleImage" onclick="editLayer(this)">-->
         </div>
-    </body>
+    </div>
+    <div id="control">
+        <h2>CONTROL</h2>
+        <tr>
+            <td>
+                <h3>Choose Cake Model</h3>
+                <div id="selectCakeBox">
+                    <div>
+                        <input class="exampleImage" type="image" style=" background-image:url()" value="type1" onclick="UpdateType(this)" id="selectType">
+                        <input class="exampleImage" type="image" style=" background-image:url();" value="type2" onclick="UpdateType(this)" id="selectType">
+                        <input class="exampleImage" type="image" style=" background-image:url();" value="type3" onclick="UpdateType(this)" id="selectType">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <h3>Chosse Cake Color</h3>
+                <div id="selectColorBox">
+                    <div>
+                        <input class="exampleImage" type="image" style=" background-color: red;" value="red" onclick="UpdateColor(this)" id="selectColor">
+                        <input class="exampleImage" type="image" style=" background-color: pink;" value="pink" onclick="UpdateColor(this)" id="selectColor">
+                        <input class="exampleImage" type="image" style=" background-color: orange;" value="orange" onclick="UpdateColor(this)" id="selectColor">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <h3>Choose Cake Decoration</h3>
+                <div id="selectDeco">
+                    <div>
+                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0133.JPG);" value="">
+                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0130.JPG);" value="">
+                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0130.JPG);" value="">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div id="third">
+                    <div>
+                        <input style="border-radius: 10px; margin-right: 50px;" type="button" value="층별 적용" onclick="changeMode(this)" id="each">
+                        <input style="border-radius: 10px; margin-right: 50px;" type="button" value="전체 적용" onclick="changeMode(this)" id="all" disabled = 'disabled'>
+                        <select style="height: 25px;">
+                            <option>사이즈 선택</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="search"></label>
+                        <input id="search" type="file" value="이미지 찾기">
+                    </div>
+                </div>
+            </td>
+            <td>
+                <div id="final">
+                    <input type="button" value="ADD LAYER" id="addLayer" onclick="AddLayer()">
+                    <input type="button" value="APPLY" id="apply" onclick="UpdateStatus()" disabled="disabled">
+                    <input type="button" value="RETURN" onclick="popStatus()">
+                    <input type="button" value="DONE">
+                </div>
+            </td>
+        </tr>
+    </div>
+</div>
+<script src="webgl-utils.js"></script>
+<script src="webgl-debug.js"></script>
+<script src="cuon-utils.js"></script>
+<script src="cuon-matrix.js"></script>
+<script src="Cake.js"></script>
+</body>
 </html>
