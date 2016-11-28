@@ -170,25 +170,38 @@ var UpdateStatus = function(){
     var newColor = document.getElementById('selectColor');
     var newType = document.getElementById('selectType');
 
-    if(select.value == -1){
+    if(selectedLayer == -1){
         alert("Appropriate Layer has to be chosen!!");
     }
     else{
-        curStatus.cakeLayers[select.value].color = status.colorChoose;
-        curStatus.cakeLayers[select.value].type = newType.value;
+        curStatus.cakeLayers[selectedLayer-1].color = curStatus.colorChoose;
+        //curStatus.cakeLayers[selectedLayer].type = newType.value;
+        var selectedId = selectedLayer-1;
+        var optionOld = document.getElementById(selectedId);
 
+        var option = document.createElement('input');
+        option.type = "image";
+        option.setAttribute("style", "background-color: " + curStatus.colorChoose + ";");
+        //style=" background-color: red;"
+        option.id = selectedLayer-1;
+        option.value = selectedLayer;
+        option.setAttribute("class", "exampleImage") ;
+        option.text = "Layer" + (curStatus.cakeLayers.length);
+        option.setAttribute("onclick", "editLayer(this)");
+        //select.appendChild(option);
+        select.replaceChild(option, optionOld);
 
-        switch(newColor.value){
+        switch(curStatus.cakeLayers[selectedLayer-1].color){
             case -1 : Cakecolor = [1.0,1.0,1.0,1.0]; break;
             case "red" : Cakecolor = [1.0, 0.0, 0.0, 1.0]; break;
             case "pink" : Cakecolor = [1.0, 0.0, 1.0, 1.0]; break;
             case "orange" : Cakecolor = [1.0, 0.5, 0.0, 1.0]; break;
         }
         for( var i = 0 ; i < 24; i++){
-            curStatus.cakeLayers[select.value].vertice[ i * 7 + 3 ] = Cakecolor[0];
-            curStatus.cakeLayers[select.value].vertice[ i * 7 + 4 ] = Cakecolor[1];
-            curStatus.cakeLayers[select.value].vertice[ i * 7 + 5 ] = Cakecolor[2];
-            curStatus.cakeLayers[select.value].vertice[ i * 7 + 6 ] = Cakecolor[3];
+            curStatus.cakeLayers[selectedLayer-1].vertice[ i * 7 + 3 ] = Cakecolor[0];
+            curStatus.cakeLayers[selectedLayer-1].vertice[ i * 7 + 4 ] = Cakecolor[1];
+            curStatus.cakeLayers[selectedLayer-1].vertice[ i * 7 + 5 ] = Cakecolor[2];
+            curStatus.cakeLayers[selectedLayer-1].vertice[ i * 7 + 6 ] = Cakecolor[3];
         }
         //newColor.value = -1;
         //newType.value = -1;
@@ -338,16 +351,16 @@ var editLayer = function(obj){
     var newColor = document.getElementById('selectColor');
     var newType = document.getElementById('selectType');
 
-    if(select.value == -1){
-        newColor.value = -1;
-        newType.value = -1;
-        selectedLayer = -1;
-    }
-    else {
-        newColor.value = curStatus.cakeLayers[select.value].color;
-        newType.value = curStatus.cakeLayers[select.value].type;
-        selectedLayer = select.value;
-    }
+    //if(select.value == -1){
+    //    newColor.value = -1;
+    //    newType.value = -1;
+    //    selectedLayer = -1;
+    //}
+    //else {
+    //newColor.value = curStatus.cakeLayers[obj.value].colorChoose;
+    //newType.value = curStatus.cakeLayers[obj.value].type;
+    selectedLayer = obj.value;
+    //}
 };
 
 var changeMode = function(obj){
