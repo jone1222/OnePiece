@@ -1,4 +1,4 @@
-/* 
+/*
  * To change this license header, choose License Headers in Project Properties.
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
@@ -10,10 +10,11 @@ var VSHADER_SOURCE = //  Vertex Shader
     'uniform vec3 u_Pos; \n' +
     'uniform vec3 u_Move; \n' +
     'uniform mat4 u_Trans; \n' +
+    'uniform vec3 u_Size; \n' +
     'varying vec4 v_Color; \n' +
     'varying vec2 v_texCoord; \n' +
     'void main(){ \n' +
-    '   vec4 newPos =vec4(0.5*a_Position.xyz, a_Position.w); \n' + //  gl_Position : 4차원 float 벡터 타입
+    '   vec4 newPos =vec4(0.5*u_Size*a_Position.xyz, a_Position.w); \n' + //  gl_Position : 4차원 float 벡터 타입
     '   newPos.xyz= newPos.xyz +u_Pos +u_Move; \n' +
     '   gl_Position = u_Trans * newPos; \n' +
     '   v_Color = a_Color; \n' +
@@ -27,7 +28,7 @@ var FSHADER_SOURCE =
     'varying vec2 v_texCoord; \n' +
     'void main(){ \n' +
     '   gl_FragColor = texture2D(u_Sampler, v_texCoord); \n' +
-    //'   gl_FragColor = v_Color; \n' +  //  gl_FragColor : 4차원 float 벡터 타입
+//'   gl_FragColor = v_Color; \n' +  //  gl_FragColor : 4차원 float 벡터 타입
     '} \n';
 
 var vertices = [// Coordinates
@@ -102,7 +103,7 @@ var textureCoordinates = [
 var matrix = new Matrix4();
 matrix.setIdentity();
 matrix.scale(0.8, 0.4, 0.4);
-matrix.translate(0, -0.9, 0);
+matrix.translate(0, -1.8, 0);
 
 var locationT = {};
 locationT.x = 0.0;
@@ -112,71 +113,75 @@ var Status = function () {
     this.cakeLayers = [];
     this.colorChoose = -1;
     this.typeChoose = -1;
+    this.sizeChoose = 0.0;
 };
 
 Status.prototype.copyStatus = function (target) {
     this.cakeLayers.length = 0;
 
     for (var i = 0; i < target.cakeLayers.length; i++) {
-        var tempCake = new CakeLayer(-1, -1);
+        var tempCake = new CakeLayer(-1, -1, 1.0);
         tempCake.color = target.cakeLayers[i].color;
         tempCake.type = target.cakeLayers[i].type;
+        tempCake.size = target.cakeLayers[i].size;
         switch (tempCake.color) {
-            case -1 :
+            case -1:
                 Cakecolor = [1.0, 1.0, 1.0, 1.0];
                 break;
-            case "red" :
+            case "red":
                 Cakecolor = [1.0, 0.0, 0.0, 1.0];
                 break;
-            case "pink" :
+            case "pink":
                 Cakecolor = [1.0, 0.0, 1.0, 1.0];
                 break;
-            case "orange" :
+            case "orange":
                 Cakecolor = [1.0, 0.5, 0.0, 1.0];
                 break;
         }
         for (var j = 0; j < 24; j++) {
-            tempCake.vertice[ j * 7 + 3 ] = Cakecolor[0];
-            tempCake.vertice[ j * 7 + 4 ] = Cakecolor[1];
-            tempCake.vertice[ j * 7 + 5 ] = Cakecolor[2];
-            tempCake.vertice[ j * 7 + 6 ] = Cakecolor[3];
+            tempCake.vertice[j * 7 + 3] = Cakecolor[0];
+            tempCake.vertice[j * 7 + 4] = Cakecolor[1];
+            tempCake.vertice[j * 7 + 5] = Cakecolor[2];
+            tempCake.vertice[j * 7 + 6] = Cakecolor[3];
         }
         this.cakeLayers.push(tempCake);
     }
     this.colorChoose = target.colorChoose;
     this.typeChoose = target.typeChoose;
+    this.sizeChoose = target.sizeChoose;
 };
 
 var befStatus = new Status();
 var historyStatus = [new Status()];
-var curStatus = historyStatus[ 0 ];
+var curStatus = historyStatus[0];
 
-var CakeLayer = function (type, color) {
+var CakeLayer = function (type, color, size) {
     this.type = type;
     this.vertice = vertices.slice(0);
     this.color = color; //default value when color has not been set
+    this.size = size;
 };
 
 CakeLayer.prototype.changeColor = function (targetColor, targetVertice) {
     switch (targetColor) {
-        case -1 :
+        case -1:
             Cakecolor = [1.0, 1.0, 1.0, 1.0];
             break;
-        case "red" :
+        case "red":
             Cakecolor = [1.0, 0.0, 0.0, 1.0];
             break;
-        case "pink" :
+        case "pink":
             Cakecolor = [1.0, 0.0, 1.0, 1.0];
             break;
-        case "orange" :
+        case "orange":
             Cakecolor = [1.0, 0.5, 0.0, 1.0];
             break;
     }
     for (var i = 0; i < 24; i++) {
-        targetVertice[ i * 7 + 3 ] = Cakecolor[0];
-        targetVertice[ i * 7 + 4 ] = Cakecolor[1];
-        targetVertice[ i * 7 + 5 ] = Cakecolor[2];
-        targetVertice[ i * 7 + 6 ] = Cakecolor[3];
+        targetVertice[i * 7 + 3] = Cakecolor[0];
+        targetVertice[i * 7 + 4] = Cakecolor[1];
+        targetVertice[i * 7 + 5] = Cakecolor[2];
+        targetVertice[i * 7 + 6] = Cakecolor[3];
     }
 };
 
@@ -184,21 +189,50 @@ CakeLayer.prototype.changeType = function (layerType, receivedType) {
     layerType = receivedType;
 };
 
+CakeLayer.prototype.changeSize = function (sizeType, receivedSize) {
+    layerSize = receivedSize;
+};
+
 var Caketype = -1;
 var Cakecolor = [1.0, 1.0, 1.0, 1.0];
+var Cakesize = 0.0;
+var isEdit = false;
+var selectedLayer = -1;
+var isUpdate = false;
+var textureSet = [];
+var pastSize = 0.0;
+var count = 0;
+var height = [0];
+var checkSize = false;
+var Layercount = 1;
+
+var selectScale = function (size) {
+    curStatus.sizeChoose = size.value;
+    switch (size.value) {
+        case 0.8:
+            Cakesize = 0.8;
+            break;
+        case 1.0:
+            Cakesize = 1.0;
+            break;
+        case 1.2:
+            Cakesize = 1.2;
+            break;
+    }
+};
 
 var UpdateType = function (type) {
     switch (type.value) {
-        case -1 :
+        case -1:
             Caketype = -1;
             break;
-        case "type1" :
+        case "type1":
             Caketype = 1;
             break;
-        case "type2" :
+        case "type2":
             Caketype = 2;
             break;
-        case "type3" :
+        case "type3":
             Caketype = 3;
             break;
     }
@@ -207,24 +241,24 @@ var UpdateType = function (type) {
 var UpdateColor = function (color) {
     curStatus.colorChoose = color.value;
     switch (color.value) {
-        case -1 :
+        case -1:
             Cakecolor = [1.0, 1.0, 1.0, 1.0];
             break;
-        case "red" :
+        case "red":
             Cakecolor = [1.0, 0.0, 0.0, 1.0];
             break;
-        case "pink" :
+        case "pink":
             Cakecolor = [1.0, 0.0, 1.0, 1.0];
             break;
-        case "orange" :
+        case "orange":
             Cakecolor = [1.0, 0.5, 0.0, 1.0];
             break;
     }
     for (var i = 0; i < 24; i++) {
-        vertices[ i * 7 + 3 ] = Cakecolor[0];
-        vertices[ i * 7 + 4 ] = Cakecolor[1];
-        vertices[ i * 7 + 5 ] = Cakecolor[2];
-        vertices[ i * 7 + 6 ] = Cakecolor[3];
+        vertices[i * 7 + 3] = Cakecolor[0];
+        vertices[i * 7 + 4] = Cakecolor[1];
+        vertices[i * 7 + 5] = Cakecolor[2];
+        vertices[i * 7 + 6] = Cakecolor[3];
     }
     update_count++;
 };
@@ -234,29 +268,86 @@ var UpdateStatus = function () {
     newStatus.copyStatus(curStatus);
     historyStatus.push(newStatus);
     curStatus = historyStatus[historyStatus.length - 1];
+    var selectedLayerChanged = parseInt(selectedLayer);
 
     var select = document.getElementById('editLayer');
 
     var sample = '';
 
     switch (curStatus.colorChoose) {
-        case -1 :
+        case -1:
             sample = '';
             break;
-        case "red" :
+        case "red":
             sample = 'sample1.png';
             break;
-        case "pink" :
+        case "pink":
             sample = 'sample2.png';
             break;
-        case "orange" :
+        case "orange":
             sample = 'sample3.png';
             break;
     }
 
-    if (selectedLayer === -1) {
+    if (curStatus.sizeChoose === "0.8") {   //  0.8로 바꾸려한다.
+        if (selectedLayer - 1 === 0) {  //  1번째 layer를 선택했을 때는
+            if (curStatus.cakeLayers[1].size === "1.0") {   //2번째 layer의 크기가 1.0이면 안되므
+                checkSize = true;
+            } else if (curStatus.cakeLayers[1].size === "1.2") {    //2번째 layer의 크기가 1.2이면 안되므
+                checkSize = true;
+            }
+        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
+            checkSize = false;   //  아무 제약이 없다.
+        } else {   //    중간에 있을 때는
+            if (curStatus.cakeLayers[selectedLayer].size === "1.0") {    //  위에 넘이 1.0이면 안된다.
+                checkSize = true;
+            } else if (curStatus.cakeLayers[selectedLayer].size === "1.2") {    //  위에 넘이 1.2이면 안된다.
+                checkSize = true;
+            }
+        }
+    } else if (curStatus.sizeChoose === "1.0") {    //  1.0으로 바꾸려한다.
+        if (selectedLayer - 1 === 0) {  //  1번 layer를 선택했을 때는
+            if (curStatus.cakeLayers[1].size === "1.2") {    //  2번 째 layer의 크기가 1.2이면 안되므
+                checkSize = true;
+            }
+        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
+            if (curStatus.cakeLayers[selectedLayer - 2].size === "0.8") {     //  아래 넘이 0.8이면 안된다.
+                checkSize = true;
+            }
+        } else {    //  중간에 있을 때는
+            if (curStatus.cakeLayers[selectedLayer - 2].size === "0.8") {   //  아래 넘이 0.8이면 안된다.
+                checkSize = true;
+            } else if (curStatus.cakeLayers[selectedLayer].size === "1.2") {    //  위에 넘이 1.2이면 안된다.
+                checkSize = true;
+            }
+        }
+    } else if (curStatus.sizeChoose === "1.2") {    //  1.2으로 바꾸려한다.
+        if (selectedLayer - 1 === 0) {  //  1번째 layer를 선택했을 때는
+            if (curStatus.cakeLayers[1].size === "0.8") {   // 2번째 layer의 크기가 0.8이면 안된다.
+                checkSize = true;
+            } else if (curStatus.cakeLayers[1].size === "1.0") {    //  2번째 layer의 크기가 1.0이면 안된다.
+                checkSize = true;
+            }
+        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
+            if (curStatus.cakeLayers[selectedLayer-2].size === "0.8") { // 아래 넘이 0.8이면 안된다.
+                checkSize = true;
+            } else if (curStatus.cakeLayers[selectedLayer-2].size === "1.0") {  //  아래 넘이 0.8이면 안된다.
+                checkSize = true;
+            }
+        } else {    //  중간을 선택했을 떄는
+            if (curStatus.cakeLayers[selectedLayer-2].size === "0.8") {   //  아래 넘이 0.8이면 안된다.
+                checkSize = true;
+            } else if (curStatus.cakeLayers[selectedLayer-2].size === "1.0") {    //  아래 넘이 1.0이면 안된다.
+                checkSize = true;
+            }
+        }
+    }
+
+    if (selectedLayer === -1 || checkSize === true) {
         alert("Appropriate Layer has to be chosen!!");
+        checkSize = false;
     } else {
+        curStatus.cakeLayers[selectedLayer - 1].size = curStatus.sizeChoose;
         curStatus.cakeLayers[selectedLayer - 1].color = curStatus.colorChoose;
         var selectedId = selectedLayer - 1;
         var optionOld = document.getElementById(selectedId);
@@ -272,30 +363,91 @@ var UpdateStatus = function () {
         select.replaceChild(option, optionOld);
 
         switch (curStatus.cakeLayers[selectedLayer - 1].color) {
-            case -1 :
+            case -1:
                 Cakecolor = [1.0, 1.0, 1.0, 1.0];
                 break;
-            case "red" :
+            case "red":
                 Cakecolor = [1.0, 0.0, 0.0, 1.0];
                 break;
-            case "pink" :
+            case "pink":
                 Cakecolor = [1.0, 0.0, 1.0, 1.0];
                 break;
-            case "orange" :
+            case "orange":
                 Cakecolor = [1.0, 0.5, 0.0, 1.0];
                 break;
         }
         for (var i = 0; i < 24; i++) {
-            curStatus.cakeLayers[selectedLayer - 1].vertice[ i * 7 + 3 ] = Cakecolor[0];
-            curStatus.cakeLayers[selectedLayer - 1].vertice[ i * 7 + 4 ] = Cakecolor[1];
-            curStatus.cakeLayers[selectedLayer - 1].vertice[ i * 7 + 5 ] = Cakecolor[2];
-            curStatus.cakeLayers[selectedLayer - 1].vertice[ i * 7 + 6 ] = Cakecolor[3];
+            curStatus.cakeLayers[selectedLayer - 1].vertice[i * 7 + 3] = Cakecolor[0];
+            curStatus.cakeLayers[selectedLayer - 1].vertice[i * 7 + 4] = Cakecolor[1];
+            curStatus.cakeLayers[selectedLayer - 1].vertice[i * 7 + 5] = Cakecolor[2];
+            curStatus.cakeLayers[selectedLayer - 1].vertice[i * 7 + 6] = Cakecolor[3];
         }
+        isUpdate = true;
         DrawStatus();
     }
 };
 
-var textureSet = [];
+var calHeight = function (i) {
+    if (i + 1 === 1) {//curStatus.cakeLayers.length === 1) {
+        if (curStatus.cakeLayers[i].size === "0.8") {
+            //height[1] = 0.8;
+            pastSize = 0.8;
+        } else if (curStatus.cakeLayers[i].size === "1.0") {
+            //height[1] = 1.0;
+            pastSize = 1.0;
+        } else if (curStatus.cakeLayers[i].size === "1.2") {
+            //height[1] = 1.2;
+            pastSize = 1.2;
+        }
+    } else if (i + 1 === 2) {//curStatus.cakeLayers.length===2){
+        if (curStatus.cakeLayers[i].size === "0.8") {
+            if (pastSize === 0.8) {
+                height[1] = 0.8;    //  height[0] + pastSize -1
+                pastSize = 0.8;
+            } else if (pastSize === 1.0) {
+                height[1] = 0.9;
+                pastSize = 0.8;
+            } else if (pastSize === 1.2) {
+                height[1] = 1.0;
+                pastSize = 0.8;
+            }
+        } else if (curStatus.cakeLayers[i].size === "1.0") {
+            if (pastSize === 1.0) {
+                height[1] = 1.0;
+                pastSize = 1.0;
+            } else if (pastSize === 1.2) {
+                height[1] = 1.1;
+                pastSize = 1.0;
+            }
+        } else if (curStatus.cakeLayers[i].size === "1.2") {
+            if (pastSize === 1.2) {
+                height[1] = 1.2;
+                pastsize = 1.2;
+            }
+        }
+    } else {
+        if (curStatus.cakeLayers[i].size === "0.8") {
+            if (pastSize === 1.0) {
+                height[i] = height[i - 1] + pastSize - 0.1;
+            } else if (pastSize === 1.2) {
+                height[i] = height[i - 1] + pastSize - 0.2;
+            } else
+                height[i] = height[i - 1] + pastSize;
+            pastSize = 0.8;
+        } else if (curStatus.cakeLayers[i].size === "1.0") {
+            if (pastSize === 1.2) {
+                height[i] = height[i - 1] + pastSize - 0.1;
+            } else
+                height[i] = height[i - 1] + pastSize;
+            pastSize = 1.0;
+        } else if (curStatus.cakeLayers[i].size === "1.2") {
+            if (pastSize === 1.2) {
+                height[i] = height[i - 1] + pastSize;
+                pastSize = 1.2;
+            }
+        }
+    }
+};
 
 var DrawStatus = function () {
     var canvas = document.getElementById('gpudraw');
@@ -343,20 +495,30 @@ var DrawStatus = function () {
     var u_Sampler = gl.getUniformLocation(gl.program, image);
 
     switch (curStatus.colorChoose) {
-        case -1 :
+        case -1:
             image.src = '';
             break;
-        case "red" :
+        case "red":
             image.src = 'sample1.png';
             break;
-        case "pink" :
+        case "pink":
             image.src = 'sample2.png';
             break;
-        case "orange" :
+        case "orange":
             image.src = 'sample3.png';
             break;
     }
     loadTexture(gl, 0, texture, u_Sampler, image);
+
+    if (isUpdate === true) {
+        for (var i = 0; i < curStatus.cakeLayers.length; i++) {
+            calHeight(i);
+        }
+        isUpdate = false;
+    } else {
+        height[curStatus.cakeLayers.length] = height[curStatus.cakeLayers.length - 1];
+        calHeight(curStatus.cakeLayers.length - 1);
+    }
 
     var repeat = function () {
         update();
@@ -394,19 +556,30 @@ function rotatedraw(gl, bufferID, elementID) {
     gl.enable(gl.DEPTH_TEST);
 
     gl.clearColor(1.0, 1.0, 1.0, 1.0);
+
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+    gl.uniform3f(u_MoveLoc, 0.0, 0.0, 0.0);
+    var uPosLoc = gl.getUniformLocation(gl.program, 'u_Pos');
+    var uSizeLoc = gl.getUniformLocation(gl.program, 'u_Size');
 
     for (var i = 0; i < curStatus.cakeLayers.length; i++) {
-
+        if (curStatus.cakeLayers[i].size === "0.8") {
+            gl.uniform3f(uSizeLoc, 0.8, 0.8, 0.8);
+            //gl.uniform3f(uPosLoc, 0.0 , height, 0.0);
+        } else if (curStatus.cakeLayers[i].size === "1.0") {
+            gl.uniform3f(uSizeLoc, 1.0, 1.0, 1.0);
+            //gl.uniform3f(uPosLoc, 0.0 , height, 0.0);
+        } else if ((curStatus.cakeLayers[i].size === "1.2")) {
+            gl.uniform3f(uSizeLoc, 1.2, 1.2, 1.2);
+            //gl.uniform3f(uPosLoc, 0.0 , height, 0.0);
+        }
+        gl.uniform3f(uPosLoc, 0.0, height[i], 0.0);
         gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(curStatus.cakeLayers[i].vertice), gl.STATIC_DRAW);
-        var uPosLoc = gl.getUniformLocation(gl.program, 'u_Pos');
-        gl.uniform3f(u_MoveLoc, 0.0, 0.0, 0.0);
-        gl.uniform3f(uPosLoc, 0.0, i, 0.0);
         drawTexture(gl, image, i);
         gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
     }
 }
-var count = 0;
+
 var drawTexture = function (gl, image, i) {
     var textureBuffer = gl.createBuffer();
 
@@ -440,7 +613,6 @@ var loadTexture = function (gl, n, texture, u_Sampler, image) {
     };
 };
 
-var Layercount = 1;
 function AddLayer() {
 
     var newStatus = new Status();
@@ -451,45 +623,59 @@ function AddLayer() {
     Layercount += 1;
     var newType = document.getElementById('selectType');
 
-    var newLayer = new CakeLayer(newType.value, curStatus.colorChoose);
 
-    newLayer.changeColor(newLayer.color, newLayer.vertice);
-
-    curStatus.cakeLayers.push(newLayer);
-
-    var sample = '';
-
-    switch (curStatus.colorChoose) {
-        case -1 :
-            sample = '';
-            break;
-        case "red" :
-            sample = 'sample1.png';
-            break;
-        case "pink" :
-            sample = 'sample2.png';
-            break;
-        case "orange" :
-            sample = 'sample3.png';
-            break;
+    if (curStatus.sizeChoose === "1.0") {
+        if (pastSize === 0.8) {
+            checkSize = true;
+        }
+    } else if (curStatus.sizeChoose === "1.2") {
+        if (pastSize === 0.8) {
+            checkSize = true;
+        } else if (pastSize === 1.0) {
+            checkSize = true;
+        }
     }
 
-    var select = document.getElementById('editLayer');
-    var option = document.createElement('input');
-    option.type = "image";
-    option.setAttribute("style", "background-image:url(" + sample + ");");
-    option.id = curStatus.cakeLayers.length - 1;
-    option.value = curStatus.cakeLayers.length;
-    option.setAttribute("class", "exampleImage");
-    option.setAttribute("onclick", "editLayer(this)");
-    select.appendChild(option);
+    if (curStatus.sizeChoose === 0.0 || curStatus.colorChoose === -1 || checkSize === true) {
+        alert("You must choose appropriately!!");
+        checkSize = false;
+    } else {
+        var newLayer = new CakeLayer(newType.value, curStatus.colorChoose, curStatus.sizeChoose);
 
+        newLayer.changeColor(newLayer.color, newLayer.vertice);
 
-    DrawStatus();
+        curStatus.cakeLayers.push(newLayer);
+
+        var sample = '';
+
+        switch (curStatus.colorChoose) {
+            case -1:
+                sample = '';
+                break;
+            case "red":
+                sample = 'sample1.png';
+                break;
+            case "pink":
+                sample = 'sample2.png';
+                break;
+            case "orange":
+                sample = 'sample3.png';
+                break;
+        }
+
+        var select = document.getElementById('editLayer');
+        var option = document.createElement('input');
+        option.type = "image";
+        option.setAttribute("style", "background-image:url(" + sample + ");");
+        option.id = curStatus.cakeLayers.length - 1;
+        option.value = curStatus.cakeLayers.length;
+        option.setAttribute("class", "exampleImage");
+        option.setAttribute("onclick", "editLayer(this)");
+        select.appendChild(option);
+
+        DrawStatus();
+    }
 }
-var isEdit = false;
-
-var selectedLayer = -1;
 
 var editLayer = function (obj) {
     selectedLayer = obj.value;

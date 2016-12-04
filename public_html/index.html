@@ -30,9 +30,9 @@ and open the template in the editor.
                 <h3>Choose Cake Model</h3>
                 <div id="selectCakeBox">
                     <div>
-                        <input class="exampleImage" type="image" style=" background-image:url()" value="type1" onclick="UpdateType(this)" id="selectType">
-                        <input class="exampleImage" type="image" style=" background-image:url();" value="type2" onclick="UpdateType(this)" id="selectType">
-                        <input class="exampleImage" type="image" style=" background-image:url();" value="type3" onclick="UpdateType(this)" id="selectType">
+                        <input class="exampleImage" type="image" value="type1" onclick="UpdateType(this)" id="selectType">
+                        <input class="exampleImage" type="image" value="type2" onclick="UpdateType(this)" id="selectType">
+                        <input class="exampleImage" type="image" value="type3" onclick="UpdateType(this)" id="selectType">
                     </div>
                 </div>
             </td>
@@ -40,9 +40,9 @@ and open the template in the editor.
                 <h3>Chosse Cake Color</h3>
                 <div id="selectColorBox">
                     <div>
-                        <input class="exampleImage" type="image" style=" background-color: red;" value="red" onclick="UpdateColor(this)" id="selectColor">
-                        <input class="exampleImage" type="image" style=" background-color: pink;" value="pink" onclick="UpdateColor(this)" id="selectColor">
-                        <input class="exampleImage" type="image" style=" background-color: orange;" value="orange" onclick="UpdateColor(this)" id="selectColor">
+                        <input class="exampleImage" type="image" style=" background-image:url(sample1.png);" value="red" onclick="UpdateColor(this)" id="selectColor">
+                        <input class="exampleImage" type="image" style=" background-image:url(sample2.png);" value="pink" onclick="UpdateColor(this)" id="selectColor">
+                        <input class="exampleImage" type="image" style=" background-image:url(sample3.png);" value="orange" onclick="UpdateColor(this)" id="selectColor">
                     </div>
                 </div>
             </td>
@@ -50,9 +50,9 @@ and open the template in the editor.
                 <h3>Choose Cake Decoration</h3>
                 <div id="selectDeco">
                     <div>
-                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0133.JPG);" value="">
-                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0130.JPG);" value="">
-                        <input class="exampleImage" type="image" style=" background-image:url(IMG_0130.JPG);" value="">
+                        <input class="exampleImage" type="image" value="">
+                        <input class="exampleImage" type="image" value="">
+                        <input class="exampleImage" type="image" value="">
                     </div>
                 </div>
             </td>
@@ -61,8 +61,11 @@ and open the template in the editor.
                     <div>
                         <input style="border-radius: 10px; margin-right: 50px;" type="button" value="층별 적용" onclick="changeMode(this)" id="each">
                         <input style="border-radius: 10px; margin-right: 50px;" type="button" value="전체 적용" onclick="changeMode(this)" id="all" disabled = 'disabled'>
-                        <select style="height: 25px;">
-                            <option>사이즈 선택</option>
+                        <select style="height: 25px;" onclick="selectScale(this)">
+                            <option value="0.0">사이즈 선택</option>
+                            <option value="0.8">X0.8</option>
+                            <option value="1.0">X1.0</option>
+                            <option value="1.2">X1.2</option>
                         </select>
                     </div>
                     <div>
