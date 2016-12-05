@@ -4,32 +4,32 @@
  * and open the template in the editor.
  */
 var VSHADER_SOURCE = //  Vertex Shader
-    'attribute vec4 a_Position; \n' +
-    'attribute vec4 a_Color; \n' +
-    'attribute vec2 a_texCoord; \n' +
-    'uniform vec3 u_Pos; \n' +
-    'uniform vec3 u_Move; \n' +
-    'uniform mat4 u_Trans; \n' +
-    'uniform vec3 u_Size; \n' +
-    'varying vec4 v_Color; \n' +
-    'varying vec2 v_texCoord; \n' +
-    'void main(){ \n' +
-    '   vec4 newPos =vec4(0.5*u_Size*a_Position.xyz, a_Position.w); \n' + //  gl_Position : 4차원 float 벡터 타입
-    '   newPos.xyz= newPos.xyz +u_Pos +u_Move; \n' +
-    '   gl_Position = u_Trans * newPos; \n' +
-    '   v_Color = a_Color; \n' +
-    '   v_texCoord = a_texCoord; \n' +
-    '} \n';
+        'attribute vec4 a_Position; \n' +
+        'attribute vec4 a_Color; \n' +
+        'attribute vec2 a_texCoord; \n' +
+        'uniform vec3 u_Pos; \n' +
+        'uniform vec3 u_Move; \n' +
+        'uniform mat4 u_Trans; \n' +
+        'uniform vec3 u_Size; \n' +
+        'varying vec4 v_Color; \n' +
+        'varying vec2 v_texCoord; \n' +
+        'void main(){ \n' +
+        '   vec4 newPos =vec4(0.5*u_Size*a_Position.xyz, a_Position.w); \n' + //  gl_Position : 4차원 float 벡터 타입
+        '   newPos.xyz= newPos.xyz +u_Pos +u_Move; \n' +
+        '   gl_Position = u_Trans * newPos; \n' +
+        '   v_Color = a_Color; \n' +
+        '   v_texCoord = a_texCoord; \n' +
+        '} \n';
 
 var FSHADER_SOURCE =
-    'precision mediump float; \n' +
-    'uniform sampler2D u_Sampler; \n' +
-    'varying vec4 v_Color; \n' +
-    'varying vec2 v_texCoord; \n' +
-    'void main(){ \n' +
-    '   gl_FragColor = texture2D(u_Sampler, v_texCoord); \n' +
+        'precision mediump float; \n' +
+        'uniform sampler2D u_Sampler; \n' +
+        'varying vec4 v_Color; \n' +
+        'varying vec2 v_texCoord; \n' +
+        'void main(){ \n' +
+        '   gl_FragColor = texture2D(u_Sampler, v_texCoord); \n' +
 //'   gl_FragColor = v_Color; \n' +  //  gl_FragColor : 4차원 float 벡터 타입
-    '} \n';
+        '} \n';
 
 var vertices = [// Coordinates
     1.0, 1.0, 1.0, 1, 0, 0, 1,
@@ -205,6 +205,7 @@ var count = 0;
 var height = [0];
 var checkSize = false;
 var Layercount = 1;
+var isDone = false;
 
 var selectScale = function (size) {
     curStatus.sizeChoose = size.value;
@@ -266,8 +267,8 @@ var UpdateColor = function (color) {
 var UpdateStatus = function () {
     var newStatus = new Status();
     newStatus.copyStatus(curStatus);
-    historyStatus.push(newStatus);
-    curStatus = historyStatus[historyStatus.length - 1];
+  //  historyStatus.push(newStatus);
+  //  curStatus = historyStatus[historyStatus.length - 1];
     var selectedLayerChanged = parseInt(selectedLayer);
 
     var select = document.getElementById('editLayer');
@@ -275,30 +276,39 @@ var UpdateStatus = function () {
     var sample = '';
 
     switch (curStatus.colorChoose) {
-        case -1:
-            sample = '';
-            break;
-        case "red":
-            sample = 'sample1.png';
-            break;
-        case "pink":
-            sample = 'sample2.png';
-            break;
-        case "orange":
-            sample = 'sample3.png';
-            break;
-    }
+            case -1:
+                sample = '';
+                break;
+            case "red":
+                sample = 'sample1.png';
+                break;
+            case "pink":
+                sample = 'sample2.png';
+                break;
+            case "orange":
+                sample = 'sample3.png';
+                break;
+            case "100":
+                sample = textureSrc[0];
+                break;
+            case "101":
+                sample = textureSrc[1];
+                break;
+            case "102":
+                sample = textureSrc[2];
+                break;
+        }
 
     if (curStatus.sizeChoose === "0.8") {   //  0.8로 바꾸려한다.
         if (selectedLayer - 1 === 0) {  //  1번째 layer를 선택했을 때는
-            if (curStatus.cakeLayers[1].size === "1.0") {   //2번째 layer의 크기가 1.0이면 안되므
+            if (curStatus.cakeLayers[1].size === "1.0") {   //2번째 layer의 크기가 1.0이면 안되므  
                 checkSize = true;
             } else if (curStatus.cakeLayers[1].size === "1.2") {    //2번째 layer의 크기가 1.2이면 안되므
                 checkSize = true;
             }
-        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
+        } else if (selectedLayerChanged === curStatus.cakeLayers.length) {    //  맨 위를 선택했을 때는
             checkSize = false;   //  아무 제약이 없다.
-        } else {   //    중간에 있을 때는
+        } else {   //    중간에 있을 때는 
             if (curStatus.cakeLayers[selectedLayer].size === "1.0") {    //  위에 넘이 1.0이면 안된다.
                 checkSize = true;
             } else if (curStatus.cakeLayers[selectedLayer].size === "1.2") {    //  위에 넘이 1.2이면 안된다.
@@ -310,7 +320,7 @@ var UpdateStatus = function () {
             if (curStatus.cakeLayers[1].size === "1.2") {    //  2번 째 layer의 크기가 1.2이면 안되므
                 checkSize = true;
             }
-        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
+        } else if (selectedLayerChanged === curStatus.cakeLayers.length) {    //  맨 위를 선택했을 때는
             if (curStatus.cakeLayers[selectedLayer - 2].size === "0.8") {     //  아래 넘이 0.8이면 안된다.
                 checkSize = true;
             }
@@ -323,21 +333,17 @@ var UpdateStatus = function () {
         }
     } else if (curStatus.sizeChoose === "1.2") {    //  1.2으로 바꾸려한다.
         if (selectedLayer - 1 === 0) {  //  1번째 layer를 선택했을 때는
-            if (curStatus.cakeLayers[1].size === "0.8") {   // 2번째 layer의 크기가 0.8이면 안된다.
+            checkSize = false;
+        } else if (selectedLayerChanged === curStatus.cakeLayers.length) {    //  맨 위를 선택했을 때는
+            if (curStatus.cakeLayers[selectedLayer - 2].size === "0.8") { // 아래 넘이 0.8이면 안된다.
                 checkSize = true;
-            } else if (curStatus.cakeLayers[1].size === "1.0") {    //  2번째 layer의 크기가 1.0이면 안된다.
-                checkSize = true;
-            }
-        } else if(selectedLayerChanged === curStatus.cakeLayers.length){    //  맨 위를 선택했을 때는
-            if (curStatus.cakeLayers[selectedLayer-2].size === "0.8") { // 아래 넘이 0.8이면 안된다.
-                checkSize = true;
-            } else if (curStatus.cakeLayers[selectedLayer-2].size === "1.0") {  //  아래 넘이 0.8이면 안된다.
+            } else if (curStatus.cakeLayers[selectedLayer - 2].size === "1.0") {  //  아래 넘이 0.8이면 안된다.
                 checkSize = true;
             }
         } else {    //  중간을 선택했을 떄는
-            if (curStatus.cakeLayers[selectedLayer-2].size === "0.8") {   //  아래 넘이 0.8이면 안된다.
+            if (curStatus.cakeLayers[selectedLayer - 2].size === "0.8") {   //  아래 넘이 0.8이면 안된다.
                 checkSize = true;
-            } else if (curStatus.cakeLayers[selectedLayer-2].size === "1.0") {    //  아래 넘이 1.0이면 안된다.
+            } else if (curStatus.cakeLayers[selectedLayer - 2].size === "1.0") {    //  아래 넘이 1.0이면 안된다.
                 checkSize = true;
             }
         }
@@ -507,6 +513,15 @@ var DrawStatus = function () {
         case "orange":
             image.src = 'sample3.png';
             break;
+        case "100":
+            image.src = textureSrc[0];
+            break;
+        case "101":
+            image.src = textureSrc[1];
+            break;
+        case "102":
+            image.src = textureSrc[2];
+            break;
     }
     loadTexture(gl, 0, texture, u_Sampler, image);
 
@@ -521,14 +536,15 @@ var DrawStatus = function () {
     }
 
     var repeat = function () {
-        update();
+        if (isDone === true)
+            update();
         rotatedraw(gl, vbo, veo);
         requestAnimationFrame(repeat);
     };
 
     repeat();
-
 };
+
 var update_count = 0;
 var image = new Image();
 var update = function () {
@@ -661,6 +677,15 @@ function AddLayer() {
             case "orange":
                 sample = 'sample3.png';
                 break;
+            case "100":
+                sample = textureSrc[0];
+                break;
+            case "101":
+                sample = textureSrc[1];
+                break;
+            case "102":
+                sample = textureSrc[2];
+                break;
         }
 
         var select = document.getElementById('editLayer');
@@ -718,5 +743,54 @@ function popStatus() {
     var select = document.getElementById('editLayer');
     var latest = document.getElementById(curStatus.cakeLayers.length);
     select.removeChild(latest);
+  
     count--;
+    
+     for (var i = 0; i < curStatus.cakeLayers.length; i++) {
+            calHeight(i);
+        }
 }
+
+function finish() {
+    if (isDone === false)
+        isDone = true;
+    else
+        isDone = false;
+}
+
+var numTexture = 0;
+var textureSrc = [];
+
+var addTexture = function (obj) {
+    var filePath = obj.value;
+    var splitPath = filePath.split("\\");
+    var realPath = splitPath[splitPath.length - 1];
+
+    var newImage = new Image();
+
+    newImage.src = realPath;
+    newImage.onload = function () {
+        textureSrc[numTexture] = realPath;
+        var w = newImage.width;
+        var h = newImage.height;
+
+        if (w === 32 || w === 64 || w === 128 || w === 256 || w === 512 || w === 1024 || w === 2048) {
+            if (h === 32 || h === 64 || h === 128 || h === 256 || h === 512 || h === 1024 || h === 2048) {
+                var colorBox = document.getElementById('examples');
+                var option = document.createElement('input');
+                option.type = "image";
+                option.setAttribute("style", "background-image:url(" + realPath + ");");
+                option.id = "selectColor";
+                option.value = numTexture + 100;
+                numTexture++;
+                option.setAttribute("class", "exampleImage");
+                option.setAttribute("onclick", "UpdateColor(this)");
+                colorBox.appendChild(option);
+            } else {
+                alert("파일 크기는 2의 거듭제곱 형식만 가능하다.");
+            }
+        } else {
+            alert("파일 크기는 2의 거듭제곱 형식만 가능하다.");
+        }
+    };
+};

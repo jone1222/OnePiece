@@ -24,9 +24,7 @@ and open the template in the editor.
         </div>
     </div>
     <div id="control">
-        <h2>CONTROL</h2>
-        <tr>
-            <td>
+
                 <h3>Choose Cake Model</h3>
                 <div id="selectCakeBox">
                     <div>
@@ -35,18 +33,16 @@ and open the template in the editor.
                         <input class="exampleImage" type="image" value="type3" onclick="UpdateType(this)" id="selectType">
                     </div>
                 </div>
-            </td>
-            <td>
+
                 <h3>Chosse Cake Color</h3>
                 <div id="selectColorBox">
-                    <div>
+                    <div id = "examples">
                         <input class="exampleImage" type="image" style=" background-image:url(sample1.png);" value="red" onclick="UpdateColor(this)" id="selectColor">
                         <input class="exampleImage" type="image" style=" background-image:url(sample2.png);" value="pink" onclick="UpdateColor(this)" id="selectColor">
                         <input class="exampleImage" type="image" style=" background-image:url(sample3.png);" value="orange" onclick="UpdateColor(this)" id="selectColor">
                     </div>
                 </div>
-            </td>
-            <td>
+
                 <h3>Choose Cake Decoration</h3>
                 <div id="selectDeco">
                     <div>
@@ -55,8 +51,7 @@ and open the template in the editor.
                         <input class="exampleImage" type="image" value="">
                     </div>
                 </div>
-            </td>
-            <td>
+           
                 <div id="third">
                     <div>
                         <input style="border-radius: 10px; margin-right: 50px;" type="button" value="층별 적용" onclick="changeMode(this)" id="each">
@@ -70,19 +65,17 @@ and open the template in the editor.
                     </div>
                     <div>
                         <label for="search"></label>
-                        <input id="search" type="file" value="이미지 찾기">
+                        <input id="search" type="file" value="이미지 찾기" accept="image/*" onchange="addTexture(this)">
                     </div>
                 </div>
-            </td>
-            <td>
+         
                 <div id="final">
                     <input type="button" value="ADD LAYER" id="addLayer" onclick="AddLayer()">
                     <input type="button" value="APPLY" id="apply" onclick="UpdateStatus()" disabled="disabled">
                     <input type="button" value="RETURN" onclick="popStatus()">
-                    <input type="button" value="DONE">
+                    <input type="button" value="DONE" onclick="finish()" >
                 </div>
-            </td>
-        </tr>
+           
     </div>
 </div>
 <script src="webgl-utils.js"></script>
